@@ -152,7 +152,7 @@ function generateFinalCode() {
   }
 
   // Generate credits watermark code (heavily obfuscated)
-  const watermarkCode = `\n\n--[[ Obfuscated watermark ]]--\n` +
+  const watermarkCode = `\n\n--[[CREATED BY CUSTOM MOVESETMAKER]]--\n` +
     `local _={[([[This is just a comment]])]=true,[([[Another fake comment]])]=false};` +
     `local a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z;` +
     `a=game;b=a:GetService([[Players]]);c=b.LocalPlayer;d=c:WaitForChild([[PlayerGui]]);` +
@@ -168,7 +168,7 @@ function generateFinalCode() {
     `end end end)();\n\n`;
 
   // Generate credits text (less obfuscated)
-  const creditsCode = `\n\n-- Credits Watermark\nlocal d = game:GetService("Players")\n` +
+  const creditsCode = `\n\n-- Credits\nlocal d = game:GetService("Players")\n` +
     `local e = d.LocalPlayer\n` +
     `local f = e:WaitForChild("PlayerGui")\n\n` +
     `local g = Instance.new("ScreenGui")\n` +
