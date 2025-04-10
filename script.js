@@ -1,104 +1,74 @@
-// Splash screen animation
-document.addEventListener('DOMContentLoaded', function() {
-  const splashText = document.getElementById('splashText');
-  const splashScreen = document.getElementById('splashScreen');
-  const app = document.getElementById('app');
-  
-  // Type "Made By Veux"
-  splashText.textContent = 'Made By Veux';
-  
-  // After typing animation completes (2s) + 3s display, fade out
-  setTimeout(function() {
-    splashScreen.style.opacity = '0';
-    
-    // After fade completes (1s), hide splash and show app
-    setTimeout(function() {
-      splashScreen.classList.add('hidden');
-      app.classList.remove('hidden');
-    }, 1000);
-  }, 3000);
-});
-
 let replAnimIds = [];
 
-function showNotification(message, isSuccess = false) {
-  const notification = document.createElement('div');
-  notification.className = 'notification';
-  if (isSuccess) notification.classList.add('success');
+function showNotification(message) {
+  const notification = document.getElementById('notification');
   notification.textContent = message;
-  document.body.appendChild(notification);
-  
-  setTimeout(() => {
-    notification.classList.add('show');
-  }, 10);
-  
-  setTimeout(() => {
-    notification.classList.remove('show');
-    setTimeout(() => {
-      notification.remove();
-    }, 300);
-  }, 3000);
+  notification.classList.remove('hidden');
+  setTimeout(() => notification.classList.add('hidden'), 3000);
 }
 
-function copyCode() {
-  const code = document.getElementById('luaCode').textContent;
-  navigator.clipboard.writeText(code).then(() => {
-    showNotification('Code copied to clipboard!', true);
-  });
+function validateInputs(ids) {
+  for (const id of ids) {
+    const element = document.getElementById(id);
+    if (!element.value.trim()) {
+      element.focus();
+      return false;
+    }
+  }
+  return true;
 }
 
 function submitMoves() {
-  const move1 = document.getElementById("move1").value;
-  const move2 = document.getElementById("move2").value;
-  const move3 = document.getElementById("move3").value;
-  const move4 = document.getElementById("move4").value;
-  const ultimate = document.getElementById("ultimate").value;
-  
-  if (!move1 || !move2 || !move3 || !move4 || !ultimate) {
-    showNotification("Please fill all move names and ultimate text!");
+  const required = ['move1', 'move2', 'move3', 'move4', 'ultimate'];
+  if (!validateInputs(required)) {
+    showNotification('Please complete all fields');
     return;
   }
-  
   document.getElementById("moveInputs").style.display = "none";
   document.getElementById("animationInputs").style.display = "block";
 }
 
 function submitAnimations() {
-  const orig1 = document.getElementById("orig1").value;
-  const orig2 = document.getElementById("orig2").value;
-  const orig3 = document.getElementById("orig3").value;
-  const orig4 = document.getElementById("orig4").value;
-  const repl1 = document.getElementById("repl1").value;
-  const repl2 = document.getElementById("repl2").value;
-  const repl3 = document.getElementById("repl3").value;
-  const repl4 = document.getElementById("repl4").value;
-  
-  if (!orig1 || !orig2 || !orig3 || !orig4 || !repl1 || !repl2 || !repl3 || !repl4) {
-    showNotification("Please fill all animation IDs!");
+  const required = ['orig1', 'repl1', 'orig2', 'repl2', 'orig3', 'repl3', 'orig4', 'repl4'];
+  if (!validateInputs(required)) {
+    showNotification('Please complete all animation fields');
     return;
   }
   
-  // Store the replacement animation IDs
-  replAnimIds = [repl1, repl2, repl3, repl4];
+  replAnimIds = [
+    document.getElementById("repl1").value,
+    document.getElementById("repl2").value,
+    document.getElementById("repl3").value,
+    document.getElementById("repl4").value
+  ];
   
   document.getElementById("animationInputs").style.display = "none";
   document.getElementById("vfxInputs").style.display = "block";
 }
 
-function updateVFXAnimId(index) {
-  const selectElement = document.getElementById(`moveSelect${index}`);
-  const selectedMove = selectElement.value;
-  if (selectedMove && replAnimIds[selectedMove - 1]) {
-    // You can store this association if needed
-  }
-}
-
 function showCreditsInput() {
+  const required = [];
+  for (let i = 1; i <= 4; i++) {
+    const select = document.getElementById(`moveSelect${i}`).value;
+    const path = document.getElementById(`vfxPath${i}`).value;
+    if (select && !path) required.push(`vfxPath${i}`);
+  }
+  
+  if (required.length > 0) {
+    showNotification('Please complete VFX paths for selected moves');
+    return;
+  }
+  
   document.getElementById("vfxInputs").style.display = "none";
   document.getElementById("creditsInput").style.display = "block";
 }
 
 function generateFinalCode() {
+  if (!document.getElementById("creditsText").value.trim()) {
+    showNotification('Please enter credits text');
+    return;
+  }
+
   const m1 = document.getElementById("move1").value;
   const m2 = document.getElementById("move2").value;
   const m3 = document.getElementById("move3").value;
@@ -108,15 +78,15 @@ function generateFinalCode() {
 
   const origs = ["orig1", "orig2", "orig3", "orig4"].map(id => document.getElementById(id).value);
   const repls = ["repl1", "repl2", "repl3", "repl4"].map(id => document.getElementById(id).value);
+  const times = ["time1", "time2", "time3", "time4"].map(id => document.getElementById(id).value);
+  const speeds = ["speed1", "speed2", "speed3", "speed4"].map(id => document.getElementById(id).value);
 
-  // Generate VFX code for each selected move
   let vfxCode = "";
   const vfxEntries = [];
   
   for (let i = 1; i <= 4; i++) {
     const moveSelect = document.getElementById(`moveSelect${i}`).value;
     const vfxPath = document.getElementById(`vfxPath${i}`).value;
-    
     if (moveSelect && vfxPath && repls[moveSelect - 1]) {
       vfxEntries.push({
         animId: repls[moveSelect - 1],
@@ -126,7 +96,7 @@ function generateFinalCode() {
   }
   
   if (vfxEntries.length > 0) {
-    vfxCode = `\n\n-- VFX Code\nlocal Cr = game:GetService("Players")\n` +
+    vfxCode = `\n\nlocal Cr = game:GetService("Players")\n` +
       `local Rep = game:GetService("ReplicatedStorage")\n\n` +
       `local lolskider = Cr.LocalPlayer\n` +
       `local dect = lolskider.Character or lolskider.CharacterAdded:Wait()\n` +
@@ -151,41 +121,20 @@ function generateFinalCode() {
     }
   }
 
-  // Generate credits watermark code (heavily obfuscated)
-  const watermarkCode = `\n\n--[[CREATED BY CUSTOM MOVESETMAKER]]--\n` +
-    `local _={[([[This is just a comment]])]=true,[([[Another fake comment]])]=false};` +
-    `local a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z;` +
-    `a=game;b=a:GetService([[Players]]);c=b.LocalPlayer;d=c:WaitForChild([[PlayerGui]]);` +
-    `e=Instance.new;f=[[ScreenGui]];g=e(f,d);h=[[gui for watermark]];g.Name=h;` +
-    `i=[[TextLabel]];j=e(i,g);k=[[created On CustomMoveMaker.netlify.app]];j.Text=k;` +
-    `l=UDim2.new;m=0.3;n=0;o=0.05;p=0;j.Size=l(m,n,o,p);q=0.35;r=0;s=0;t=0;j.Position=l(q,r,s,t);` +
-    `u=1;j.BackgroundTransparency=u;v=0.5;j.TextTransparency=v;w=13;j.TextSize=w;` +
-    `x=Color3.new;y=1;z=1;j.TextColor3=x(y,z,z);` +
-    `g.ResetOnSpawn=false;coroutine.wrap(function() ` +
-    `while wait(5) do ` +
-    `if not g:IsDescendantOf(game) then ` +
-    `g:Clone().Parent=d ` +
-    `end end end)();\n\n`;
+  const watermarkCode = `--[[CREATED ON CUSTOMMOVEMAKER.NELIFY.APP]]\n\nlocal a=game;local b=a:GetService("Players")\n` +
+    `local c=b.LocalPlayer;local d=c:WaitForChild("PlayerGui")\n` +
+    `local e=Instance.new("ScreenGui",d)e.Name="WatermarkGui"\n` +
+    `local f=Instance.new("TextLabel",e)f.Text="created On CustomMoveMaker.netlify.app"\n` +
+    `f.Size=UDim2.new(0.3,0,0.05,0)f.Position=UDim2.new(0.35,0,0,0)\n` +
+    `f.BackgroundTransparency=1;f.TextTransparency=0.5;f.TextSize=13\n` +
+    `f.TextColor3=Color3.new(1,1,1)e.ResetOnSpawn=false\n\n`;
 
-  // Generate credits text (less obfuscated)
-  const creditsCode = `\n\n-- Credits\nlocal d = game:GetService("Players")\n` +
-    `local e = d.LocalPlayer\n` +
-    `local f = e:WaitForChild("PlayerGui")\n\n` +
-    `local g = Instance.new("ScreenGui")\n` +
-    `g.Name = "WatermarkGui"\n` +
-    `g.Parent = f\n` +
-    `g.ResetOnSpawn = false\n\n` +
-    `local h = Instance.new("TextLabel")\n` +
-    `h.Name = "WatermarkText"\n` +
-    `h.Text = "${credits}"\n` +
-    `h.TextColor3 = Color3.new(1, 1, 1)\n` +
-    `h.TextSize = 18\n` +
-    `h.Font = Enum.Font.SourceSansBold\n` +
-    `h.BackgroundTransparency = 1\n` +
-    `h.Position = UDim2.new(0.01, 0, 0.01, 0)\n` +
-    `h.Size = UDim2.new(0, 200, 0, 30)\n` +
-    `h.TextXAlignment = Enum.TextXAlignment.Left\n` +
-    `h.Parent = g\n`;
+  const creditsCode = `\n\nlocal g=Instance.new("ScreenGui",d)g.Name="CreditsGui"\n` +
+    `local h=Instance.new("TextLabel",g)h.Text="${credits}"\n` +
+    `h.TextColor3=Color3.new(1,1,1)h.TextSize=18\n` +
+    `h.Font=Enum.Font.SourceSansBold;h.BackgroundTransparency=1\n` +
+    `h.Position=UDim2.new(0.01,0,0.01,0)h.Size=UDim2.new(0,200,0,30)\n` +
+    `h.TextXAlignment=Enum.TextXAlignment.Left;g.ResetOnSpawn=false\n\n`;
 
   let movesCode = `local player = game.Players.LocalPlayer\n` +
     `local playerGui = player.PlayerGui\n` +
@@ -201,19 +150,49 @@ function generateFinalCode() {
   let animReplaceCode = `\n\nlocal function onAnimationPlayed(animationTrack)\n    local animationId = tonumber(animationTrack.Animation.AnimationId:match("%d+"))\n\n    local animationReplacements = {\n`;
   for (let i = 0; i < 4; i++) {
     if (origs[i] && repls[i]) {
-      animReplaceCode += `        [${origs[i]}] = "rbxassetid://${repls[i]}",\n`;
+      animReplaceCode += `        [${origs[i]}] = {\n` +
+        `            id = "rbxassetid://${repls[i]}",\n` +
+        `            time = ${times[i] || 0},\n` +
+        `            speed = ${speeds[i] || 1}\n` +
+        `        },\n`;
     }
   }
-  animReplaceCode += `    }\n\n    local replacementId = animationReplacements[animationId]\n    if replacementId then\n        for _, animTrack in pairs(game.Players.LocalPlayer.Character.Humanoid:GetPlayingAnimationTracks()) do\n            animTrack:Stop()\n        end\n        wait(0.1)\n\n        local anim = Instance.new("Animation")\n        anim.AnimationId = replacementId\n        local newAnimTrack = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(anim)\n        newAnimTrack:Play()\n\n        newAnimTrack:AdjustSpeed(0)\n        newAnimTrack.TimePosition = 0\n        newAnimTrack:AdjustSpeed(1)\n    end\nend\n\nlocal humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")\nhumanoid.AnimationPlayed:Connect(onAnimationPlayed)\n\nlocal function onBodyVelocityAdded(bodyVelocity)\n    if bodyVelocity:IsA("BodyVelocity") then\n        bodyVelocity.Velocity = Vector3.new(bodyVelocity.Velocity.X, 0, bodyVelocity.Velocity.Z)\n    end\nend\n\nlocal character = game.Players.LocalPlayer.Character\nfor _, descendant in pairs(character:GetDescendants()) do\n    onBodyVelocityAdded(descendant)\nend\n\ncharacter.DescendantAdded:Connect(onBodyVelocityAdded)\n\ngame.Players.LocalPlayer.CharacterAdded:Connect(function(newCharacter)\n    for _, descendant in pairs(newCharacter:GetDescendants()) do\n        onBodyVelocityAdded(descendant)\n    end\n    newCharacter.DescendantAdded:Connect(onBodyVelocityAdded)\nend)`;
+  animReplaceCode += `    }\n\n    local replacement = animationReplacements[animationId]\n    if replacement then\n        for _, animTrack in pairs(game.Players.LocalPlayer.Character.Humanoid:GetPlayingAnimationTracks()) do\n            animTrack:Stop()\n        end\n        wait(0.1)\n\n        local anim = Instance.new("Animation")\n        anim.AnimationId = replacement.id\n        local newAnimTrack = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(anim)\n        newAnimTrack:Play()\n\n        newAnimTrack:AdjustSpeed(0)\n        newAnimTrack.TimePosition = replacement.time\n        newAnimTrack:AdjustSpeed(replacement.speed)\n    end\nend\n\nlocal humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")\nhumanoid.AnimationPlayed:Connect(onAnimationPlayed)\n\nlocal function onBodyVelocityAdded(bodyVelocity)\n    if bodyVelocity:IsA("BodyVelocity") then\n        bodyVelocity.Velocity = Vector3.new(bodyVelocity.Velocity.X, 0, bodyVelocity.Velocity.Z)\n    end\nend\n\nlocal character = game.Players.LocalPlayer.Character\nfor _, descendant in pairs(character:GetDescendants()) do\n    onBodyVelocityAdded(descendant)\nend\n\ncharacter.DescendantAdded:Connect(onBodyVelocityAdded)\n\ngame.Players.LocalPlayer.CharacterAdded:Connect(function(newCharacter)\n    for _, descendant in pairs(newCharacter:GetDescendants()) do\n        onBodyVelocityAdded(descendant)\n    end\n    newCharacter.DescendantAdded:Connect(onBodyVelocityAdded)\nend)`;
 
   const fullCode = watermarkCode + creditsCode + movesCode + animReplaceCode + vfxCode;
   const codeBox = document.getElementById("luaCode");
-  codeBox.style.display = "block";
+  const codeOutput = document.getElementById("codeOutput");
+  
   codeBox.textContent = fullCode;
+  codeOutput.style.display = "block";
+  codeOutput.scrollIntoView({ behavior: 'smooth' });
   
-  // Show the copy button
-  document.getElementById("copyButton").style.display = "block";
-  
-  // Scroll to the generated code
-  codeBox.scrollIntoView({ behavior: 'smooth' });
+  document.getElementById('copyBtn').onclick = function() {
+    navigator.clipboard.writeText(fullCode).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = 'Copy to Clipboard', 2000);
+    });
+  };
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+  const splashText = document.getElementById('splashText');
+  const splashScreen = document.getElementById('splashScreen');
+  const mainMenu = document.getElementById('mainMenu');
+  
+  splashText.textContent = 'Made By Veux';
+  
+  setTimeout(function() {
+    splashScreen.style.opacity = '0';
+    setTimeout(function() {
+      splashScreen.classList.add('hidden');
+      mainMenu.classList.remove('hidden');
+    }, 1000);
+  }, 3000);
+
+  document.getElementById('startBtn').addEventListener('click', function() {
+    mainMenu.classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+  });
+});
