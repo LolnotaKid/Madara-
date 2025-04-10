@@ -7,73 +7,151 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  overflow: hidden;
+  min-height: 100vh;
+  overflow: auto;
 }
 
 .container {
   width: 90%;
-  max-width: 800px;
-  background: rgba(0, 0, 0, 0.8);
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 0 15px #0f0c29;
-  overflow-y: auto;
-  max-height: 95vh;
+  max-width: 900px;
+  background: rgba(10, 10, 20, 0.9);
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 0 20px rgba(15, 12, 41, 0.6);
+  margin: 20px 0;
 }
 
 .title {
   text-align: center;
-  font-size: 2.5rem;
-  margin-bottom: 20px;
+  font-size: 2.2rem;
+  margin-bottom: 25px;
   font-weight: bold;
+  color: #3f72af;
 }
 
 .field-group {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
-label {
-  font-size: 1.1rem;
+.field-group label {
+  font-size: 0.95rem;
+  color: #ddd;
   display: block;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
 }
 
-input[type="text"], select {
+input[type="text"],
+input[type="number"],
+select {
   width: 100%;
-  padding: 10px;
+  padding: 10px 12px;
   font-size: 1rem;
-  border-radius: 10px;
-  border: none;
-  outline: none;
-  background-color: #1f1f2f;
+  border-radius: 8px;
+  border: 1px solid #3f72af;
+  background: #252540;
   color: #fff;
+  outline: none;
+  transition: border 0.3s;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  border-color: #4a8aff;
 }
 
 .btn {
   display: block;
-  margin: 20px auto 0;
-  padding: 12px 25px;
+  margin: 25px auto 0;
+  padding: 12px 30px;
   font-size: 1.1rem;
   background-color: #3f72af;
   border: none;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   color: #fff;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s;
 }
 
 .btn:hover {
   background-color: #2e59d9;
+  transform: translateY(-2px);
+}
+
+.copy-btn {
+  background-color: #4CAF50;
+  margin-top: 15px;
+}
+
+.copy-btn:hover {
+  background-color: #45a049;
+}
+
+.animation-group {
+  background: rgba(30, 30, 50, 0.5);
+  border-radius: 12px;
+  padding: 18px;
+  margin-bottom: 20px;
+  border-left: 4px solid #3f72af;
+}
+
+.animation-header {
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #3f72af;
+}
+
+.animation-header h3 {
+  margin: 0;
+  color: #3f72af;
+  font-size: 1.2rem;
+}
+
+.timing-controls {
+  display: flex;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.timing-group {
+  flex: 1;
+}
+
+.timing-group label {
+  font-size: 0.9rem;
+  color: #aaa;
+}
+
+.notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #ff4444;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 8px;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+.hidden {
+  display: none !important;
 }
 
 pre {
-  white-space: pre-wrap;
   background-color: #111;
   padding: 20px;
   border-radius: 10px;
-  margin-top: 20px;
   color: #0f0;
+  overflow-x: auto;
+  max-height: 400px;
 }
 
 #splashScreen {
@@ -88,7 +166,7 @@ pre {
   background: linear-gradient(135deg, #1a1a2e, #16213e);
   z-index: 1000;
   opacity: 1;
-  transition: opacity 1s ease-out;
+  transition: opacity 1s;
 }
 
 #splashText {
@@ -98,7 +176,7 @@ pre {
   border-right: 3px solid #fff;
   white-space: nowrap;
   overflow: hidden;
-  animation: typing 2s steps(20, end), blink-caret 0.75s step-end infinite;
+  animation: typing 2s steps(20), blink-caret 0.75s step-end infinite;
 }
 
 @keyframes typing {
@@ -109,31 +187,4 @@ pre {
 @keyframes blink-caret {
   from, to { border-color: transparent }
   50% { border-color: #fff; }
-}
-
-.hidden {
-  display: none !important;
-}
-
-.notification {
-  position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #ff4444;
-  color: white;
-  padding: 15px 25px;
-  border-radius: 5px;
-  z-index: 1000;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.notification.show {
-  opacity: 1;
-}
-
-.notification.success {
-  background-color: #4CAF50;
-}
+  }
