@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Custom Moveset Maker</title>
+  <link rel="stylesheet" href="css.css">
+</head>
+<body>
+  <div id="splashScreen">
+    <div id="splashText"></div>
+  </div>
+
+  <div class="container hidden" id="app">
+    <div class="title">Custom Moveset Maker</div>
+    
+    <!-- Move Inputs Section -->
+    <div id="moveInputs">
+      <div class="field-group">
+        <label>1 MOVE NAME --></label>
+        <input type="text" id="move1" />
+      </div>
+      <div class="field-group">
+        <label>2 MOVE NAME --></label>
+        <input type="text" id="move2" />
+      </div>
+      <div class="field-group">
+        <label>3 MOVE NAME --></label>
+        <input type="text" id="move3" />
+      </div>
+      <div class="field-group">
+        <label>4 MOVE NAME --></label>
+        <input type="text" id="move4" />
+      </div>
+      <div class="field-group">
+        <label>ULTIMATE TEXT NAME --></label>
+        <input type="text" id="ultimate" />
+      </div>
+      <button class="btn" onclick="submitMoves()">Done</button>
+    </div>
+
+    <!-- Animation Inputs Section -->
+    <div id="animationInputs" style="display: none;">
+      <div class="field-group">
+        <label>Original Animation ID 1 --></label>
+        <input type="text" id="orig1" />
+        <label>Replacement Animation ID 1 --></label>
+        <input type="text" id="repl1" />
+      </div>
+      <div class="field-group">
+        <label>Original Animation ID 2 --></label>
+        <input type="text" id="orig2" />
+        <label>Replacement Animation ID 2 --></label>
+        <input type="text" id="repl2" />
+      </div>
+      <div class="field-group">
+        <label>Original Animation ID 3 --></label>
+        <input type="text" id="orig3" />
+        <label>Replacement Animation ID 3 --></label>
+        <input type="text" id="repl3" />
+      </div>
+      <div class="field-group">
+        <label>Original Animation ID 4 --></label>
+        <input type="text" id="orig4" />
+        <label>Replacement Animation ID 4 --></label>
+        <input type="text" id="repl4" />
+      </div>
+      <button class="btn" onclick="submitAnimations()">Done</button>
+    </div>
+
+    <!-- VFX Inputs Section -->
+    <div id="vfxInputs" style="display: none;">
+      <div class="field-group">
+        <label>Pick The Move To Run VFX --></label>
+        <select id="moveSelect1" onchange="updateVFXAnimId(1)">
+          <option value="">Select Move</option>
+          <option value="1">Move 1</option>
+          <option value="2">Move 2</option>
+          <option value="3">Move 3</option>
+          <option value="4">Move 4</option>
+        </select>
+        <label>VFX Path Here --></label>
+        <input type="text" id="vfxPath1" />
+      </div>
+      <div class="field-group">
+        <label>Pick The Move To Run VFX --></label>
+        <select id="moveSelect2" onchange="updateVFXAnimId(2)">
+          <option value="">Select Move</option>
+          <option value="1">Move 1</option>
+          <option value="2">Move 2</option>
+          <option value="3">Move 3</option>
+          <option value="4">Move 4</option>
+        </select>
+        <label>VFX Path Here --></label>
+        <input type="text" id="vfxPath2" />
+      </div>
+      <div class="field-group">
+        <label>Pick The Move To Run VFX --></label>
+        <select id="moveSelect3" onchange="updateVFXAnimId(3)">
+          <option value="">Select Move</option>
+          <option value="1">Move 1</option>
+          <option value="2">Move 2</option>
+          <option value="3">Move 3</option>
+          <option value="4">Move 4</option>
+        </select>
+        <label>VFX Path Here --></label>
+        <input type="text" id="vfxPath3" />
+      </div>
+      <div class="field-group">
+        <label>Pick The Move To Run VFX --></label>
+        <select id="moveSelect4" onchange="updateVFXAnimId(4)">
+          <option value="">Select Move</option>
+          <option value="1">Move 1</option>
+          <option value="2">Move 2</option>
+          <option value="3">Move 3</option>
+          <option value="4">Move 4</option>
+        </select>
+        <label>VFX Path Here --></label>
+        <input type="text" id="vfxPath4" />
+      </div>
+      <button class="btn" onclick="showCreditsInput()">Done</button>
+    </div>
+
+    <!-- Credits Input Section -->
+    <div id="creditsInput" style="display: none;">
+      <div class="field-group">
+        <label>CREDITS TEXT: MADE BY? --></label>
+        <input type="text" id="creditsText" placeholder="Enter your name/credits" />
+      </div>
+      <button class="btn" onclick="generateFinalCode()">Generate Lua Code</button>
+    </div>
+
+    <!-- Generated Code Display -->
+    <pre id="luaCode" style="display: none;"></pre>
+    <button id="copyButton" class="btn" style="display: none; margin-top: 10px;" onclick="copyCode()">Copy Code</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
