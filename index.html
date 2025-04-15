@@ -4,9 +4,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Custom Moveset Maker</title>
-  <link rel="stylesheet" href="css.css">
+  <link rel="stylesheet" href="csss.css">
 </head>
 <body>
+    
   <div id="splashScreen">
     <div id="splashText"></div>
   </div>
@@ -26,8 +27,8 @@
       <div class="menu-card">
         <h2>Update Log</h2>
         <div class="update-item">
-          <span class="update-badge">NEW</span>
-          <span>Added Speed and Position Times</span>
+          <span class="update-badge">NEW!</span>
+          <span>Added More Animations + fonts more fonts adding soon</span>
         </div>
         <div class="update-item">
           <span class="update-badge">IMPROVES</span>
@@ -60,28 +61,92 @@
     <div class="title">Custom Moveset Maker</div>
     
     <div id="moveInputs">
-      <div class="input-card">
-        <label>1 MOVE NAME</label>
-        <input type="text" id="move1" required>
-      </div>
-      <div class="input-card">
-        <label>2 MOVE NAME</label>
-        <input type="text" id="move2" required>
-      </div>
-      <div class="input-card">
-        <label>3 MOVE NAME</label>
-        <input type="text" id="move3" required>
-      </div>
-      <div class="input-card">
-        <label>4 MOVE NAME</label>
-        <input type="text" id="move4" required>
-      </div>
-      <div class="input-card">
-        <label>ULTIMATE TEXT NAME</label>
-        <input type="text" id="ultimate" required>
-      </div>
-      <button class="btn" onclick="submitMoves()">Continue</button>
+  <!-- Move 1 -->
+  <div class="input-card">
+    <label>1 MOVE NAME</label>
+    <input type="text" id="move1" required>
+    <div class="font-control">
+      <label>Font Style</label>
+      <select id="font1">
+        <option value="SourceSansBold">Default (Bold)</option>
+        <option value="Arial">Arial</option>
+        <option value="Roboto">Roboto</option>
+        <option value="Fantasy">Fantasy</option>
+        <option value="SciFi">Sci-Fi</option>
+      </select>
     </div>
+  </div>
+
+  <!-- Move 2 -->
+  <div class="input-card">
+    <label>2 MOVE NAME</label>
+    <input type="text" id="move2" required>
+    <div class="font-control">
+      <label>Font Style</label>
+      <select id="font2">
+        <option value="SourceSansBold">Default (Bold)</option>
+        <option value="Arial">Arial</option>
+        <option value="Roboto">Roboto</option>
+        <option value="Fantasy">Fantasy</option>
+        <option value="SciFi">Sci-Fi</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Move 3 -->
+  <div class="input-card">
+    <label>3 MOVE NAME</label>
+    <input type="text" id="move3" required>
+    <div class="font-control">
+      <label>Font Style</label>
+      <select id="font3">
+        <option value="SourceSansBold">Default (Bold)</option>
+        <option value="Arial">Arial</option>
+        <option value="Roboto">Roboto</option>
+        <option value="Fantasy">Fantasy</option>
+        <option value="SciFi">Sci-Fi</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Move 4 -->
+  <div class="input-card">
+    <label>4 MOVE NAME</label>
+    <input type="text" id="move4" required>
+    <div class="font-control">
+      <label>Font Style</label>
+      <select id="font4">
+        <option value="SourceSansBold">Default (Bold)</option>
+        <option value="Arial">Arial</option>
+        <option value="Roboto">Roboto</option>
+        <option value="Fantasy">Fantasy</option>
+        <option value="SciFi">Sci-Fi</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Ultimate -->
+  <div class="input-card">
+    <label>ULTIMATE TEXT NAME</label>
+    <input type="text" id="ultimate" required>
+    <div class="font-control">
+      <label>Font Style</label>
+      <select id="fontUltimate">
+        <option value="SourceSansBold">Default (Bold)</option>
+        <option value="Arial">Arial</option>
+        <option value="Roboto">Roboto</option>
+        <option value="Fantasy">Fantasy</option>
+        <option value="SciFi">Sci-Fi</option>
+      </select>
+    </div>
+  </div>
+  <button class="btn" onclick="submitMoves()">Continue</button>
+</div>
+
+<div id="generatingLoader">
+  <div class="generating-text">Please Wait Your Code Is Getting generated<span id="generatingDots"></span></div>
+  <div class="loader-spinner"></div>
+</div>
 
     <div id="animationInputs" style="display:none">
       <div class="animation-control">
@@ -167,8 +232,13 @@
           </div>
         </div>
       </div>
-      <button class="btn" onclick="submitAnimations()">Continue</button>
-    </div>
+  <div id="additionalAnimations"></div>
+  
+  <div class="btn-group">
+    <button class="btn" onclick="submitAnimations()">Continue</button>
+    <button class="btn add-btn" onclick="addAnimationField()">+ Add More Animations</button>
+  </div>
+</div>
 
     <div id="vfxInputs" style="display:none">
       <div class="vfx-control">
@@ -240,25 +310,25 @@
       </div>
       <button class="btn" onclick="showCreditsInput()">Continue</button>
     </div>
+<div id="creditsInput" style="display:none">
+  <div class="input-card">
+    <label>CREDITS TEXT</label>
+    <input type="text" id="creditsText" required>
+  </div>
+  <button class="btn" onclick="generateFinalCode()">Generate Code</button>
+</div>
 
-    <div id="creditsInput" style="display:none">
-      <div class="input-card">
-        <label>CREDITS TEXT</label>
-        <input type="text" id="creditsText" required>
-      </div>
-      <button class="btn" onclick="generateFinalCode()">Generate Code</button>
-    </div>
-
-    <div id="codeOutput" style="display:none">
-      <div class="code-container">
-        <pre id="luaCode"></pre>
-        <button id="copyBtn" class="btn copy-btn">Copy to Clipboard</button>
-      </div>
-    </div>
+<div id="codeOutput" style="display:none">
+  <div class="code-container">
+    <pre id="luaCode"></pre>
+    <button id="copyBtn" class="btn copy-btn">Copy to Clipboard</button>
+    <button onclick="downloadCode()" class="btn download-btn">Download Code (beta)</button>
+  </div>
+</div>
 
     <div id="notification" class="notification hidden"></div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="scriptt.js"></script>
 </body>
-  </html>
+                        </html>
