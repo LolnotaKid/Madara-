@@ -1,6 +1,7 @@
 let replAnimIds = [];
 let animationCount = 4;
 let maxMoveNumber = 4;
+let soundEntries = [];
 
 function showNotification(message) {
   const notification = document.getElementById('notification');
@@ -131,25 +132,60 @@ function updateVFXSection() {
     `;
     vfxContainer.insertAdjacentHTML('beforeend', vfxHTML);
   }
-  vfxContainer.insertAdjacentHTML('beforeend', `<button class="btn" onclick="showCreditsInput()">Continue</button>`);
+  vfxContainer.insertAdjacentHTML('beforeend', `<button class="btn" onclick="updateSoundSection()">Continue</button>`);
 }
 
-function showCreditsInput() {
+function updateSoundSection() {
+  const soundContainer = document.getElementById("soundsInput");
+  soundContainer.innerHTML = '';
   for (let i = 1; i <= maxMoveNumber; i++) {
-    const select = document.getElementById(`moveSelect${i}`)?.value;
-    const path = document.getElementById(`vfxPath${i}`)?.value;
-    if (select && !path) {
-      document.getElementById(`vfxPath${i}`).focus();
-      showNotification(`Please complete VFX path for Move ${select}`);
-      return;
+    const soundHTML = `
+      <div class="vfx-control">
+        <div class="setting-group">
+          <label>Pick The Move For Sound --></label>
+          <select id="soundMoveSelect${i}">
+            <option value="">Select Move</option>
+            ${Array.from({length: maxMoveNumber}, (_, j) => 
+              `<option value="${j+1}">Move ${j+1}</option>`).join('')}
+          </select>
+        </div>
+        <div class="setting-group">
+          <label>GitHub Raw URL</label>
+          <input type="text" id="soundUrl${i}">
+        </div>
+        <div class="setting-group">
+          <label>File Name</label>
+          <input type="text" id="fileName${i}">
+        </div>
+      </div>
+    `;
+    soundContainer.insertAdjacentHTML('beforeend', soundHTML);
+  }
+  soundContainer.insertAdjacentHTML('beforeend', `<button class="btn" onclick="submitSounds()">Continue</button>`);
+  document.getElementById("vfxInputs").style.display = "none";
+  document.getElementById("soundsInput").style.display = "block";
+}
+
+function submitSounds() {
+  soundEntries = [];
+  for (let i = 1; i <= maxMoveNumber; i++) {
+    const select = document.getElementById(`soundMoveSelect${i}`)?.value;
+    const url = document.getElementById(`soundUrl${i}`)?.value;
+    const fileName = document.getElementById(`fileName${i}`)?.value;
+    
+    if (select && url && fileName) {
+      soundEntries.push({
+        move: select,
+        url: url,
+        fileName: fileName
+      });
     }
-    if (!select && path) {
-      document.getElementById(`moveSelect${i}`).focus();
-      showNotification(`Please select a move for VFX ${i}`);
+    else if (select || url || fileName) {
+      showNotification('Please complete all sound fields or leave all empty');
       return;
     }
   }
-  document.getElementById("vfxInputs").style.display = "none";
+  document.getElementById("soundsInput").style.display = "none";
   document.getElementById("creditsInput").style.display = "block";
 }
 
@@ -267,6 +303,25 @@ function generateFinalCode() {
       }
     }
 
+    let soundCode = "\n\n-- Sound Code\n";
+    soundEntries.forEach(entry => {
+      soundCode += `local ${entry.fileName.replace(/[^a-zA-Z]/g, '')}Track = human.AnimationPlayed:Connect(function(track)\n`;
+      soundCode += `    if track.Animation.AnimationId == "rbxassetid://${replAnimIds[entry.move-1]}" then\n`;
+      soundCode += `        local url = "${entry.url}"\n`;
+      soundCode += `        local fileName = "${entry.fileName}"\n\n`;
+      soundCode += `        if not isfile(fileName) then\n`;
+      soundCode += `            writefile(fileName, game:HttpGet(url))\n`;
+      soundCode += `        end\n\n`;
+      soundCode += `        local sound = Instance.new("Sound")\n`;
+      soundCode += `        sound.SoundId = getcustomasset(fileName)\n`;
+      soundCode += `        sound.Volume = 1\n`;
+      soundCode += `        sound.Looped = false\n`;
+      soundCode += `        sound.Parent = game.Players.LocalPlayer.PlayerGui\n`;
+      soundCode += `        sound:Play()\n`;
+      soundCode += `    end\n`;
+      soundCode += `end)\n\n`;
+    });
+
     const watermarkCode = `\n\nlocal a=game;local b=a:GetService("Players")\n` +
       `local c=b.LocalPlayer;local d=c:WaitForChild("PlayerGui")\n` +
       `local e=Instance.new("ScreenGui",d)e.Name="WatermarkGui"\n` +
@@ -310,7 +365,7 @@ function generateFinalCode() {
     
     animReplaceCode += `    }\n\n    local replacement = animationReplacements[animationId]\n    if replacement then\n        for _, animTrack in pairs(game.Players.LocalPlayer.Character.Humanoid:GetPlayingAnimationTracks()) do\n            animTrack:Stop()\n        end\n        wait(0.1)\n\n        local anim = Instance.new("Animation")\n        anim.AnimationId = replacement.id\n        local newAnimTrack = game.Players.LocalPlayer.Character.Humanoid:LoadAnimation(anim)\n        newAnimTrack:Play()\n\n        newAnimTrack:AdjustSpeed(0)\n        newAnimTrack.TimePosition = replacement.time\n        newAnimTrack:AdjustSpeed(replacement.speed)\n    end\nend\n\nlocal humanoid = game.Players.LocalPlayer.Character:WaitForChild("Humanoid")\nhumanoid.AnimationPlayed:Connect(onAnimationPlayed)\n\nlocal function onBodyVelocityAdded(bodyVelocity)\n    if bodyVelocity:IsA("BodyVelocity") then\n        bodyVelocity.Velocity = Vector3.new(bodyVelocity.Velocity.X, 0, bodyVelocity.Velocity.Z)\n    end\nend\n\nlocal character = game.Players.LocalPlayer.Character\nfor _, descendant in pairs(character:GetDescendants()) do\n    onBodyVelocityAdded(descendant)\nend\n\ncharacter.DescendantAdded:Connect(onBodyVelocityAdded)\n\ngame.Players.LocalPlayer.CharacterAdded:Connect(function(newCharacter)\n    for _, descendant in pairs(newCharacter:GetDescendants()) do\n        onBodyVelocityAdded(descendant)\n    end\n    newCharacter.DescendantAdded:Connect(onBodyVelocityAdded)\nend)`;
 
-    const fullCode = watermarkCode + creditsCode + movesCode + animReplaceCode + vfxCode;
+    const fullCode = watermarkCode + creditsCode + movesCode + animReplaceCode + vfxCode + soundCode;
     const codeBox = document.getElementById("luaCode");
     const codeOutput = document.getElementById("codeOutput");
     
@@ -335,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const splashScreen = document.getElementById('splashScreen');
   const mainMenu = document.getElementById('mainMenu');
   
-  splashText.textContent = 'Made By Veux 💣🔥';
+  splashText.textContent = 'Made By Veux';
   
   setTimeout(function() {
     splashScreen.style.opacity = '0';
