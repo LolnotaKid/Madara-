@@ -525,6 +525,17 @@ pre {
   border-radius: 8px;
 }
 
+.sound-control {
+  background: rgba(40, 40, 80, 0.4);
+  padding: 1rem;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 1rem;
+  align-items: end;
+}
+
 .notification {
   position: fixed;
   bottom: 20px;
@@ -581,4 +592,4 @@ pre {
 @keyframes blink-caret {
   from, to { border-color: transparent }
   50% { border-color: #fff; }
-    }
+        }
